@@ -13,7 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "SELECT * FROM product p WHERE UPPER(p.category) LIKE UPPER(?1) || '%' ORDER BY id", nativeQuery = true)
     List<Product> findByCategory(String category);
 
-    @Query(value = "SELECT * FROM product p WHERE UPPER(p.name) LIKE UPPER(?1) || '%' ORDER BY id", nativeQuery = true)
+    @Query(value = "SELECT * FROM product p WHERE UPPER(p.name) LIKE '%' || UPPER(?1) || '%' ORDER BY id", nativeQuery = true)
     List<Product> findByName(String name);
 
 }
