@@ -5,8 +5,7 @@ import java.text.NumberFormat;
 
 public enum CurrencyEnum {
 	
-	REAL("R$", "#,##0.00"),
-	DECIMAL("DEC", "0.00");
+	REAL("R$", "#,##0.00");
 	
 	private String code;
 	private NumberFormat numberFormat;
@@ -14,11 +13,6 @@ public enum CurrencyEnum {
 	private CurrencyEnum(String code, String pattern) {
 		this.code = code;
 		this.numberFormat = new DecimalFormat(pattern);
-	}
-
-	private CurrencyEnum(String code, NumberFormat numberFormat) {
-		this.code = code;
-		this.numberFormat = numberFormat;
 	}
 	
 	public String format(Number number) {
