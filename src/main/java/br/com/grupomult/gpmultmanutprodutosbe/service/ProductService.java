@@ -1,5 +1,6 @@
 package br.com.grupomult.gpmultmanutprodutosbe.service;
 
+import br.com.grupomult.gpmultmanutprodutosbe.enums.CategoriesEnum;
 import br.com.grupomult.gpmultmanutprodutosbe.model.Product;
 import br.com.grupomult.gpmultmanutprodutosbe.model.ProductDTO;
 import br.com.grupomult.gpmultmanutprodutosbe.repository.ProductRepository;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -71,7 +74,7 @@ public class ProductService {
         final List<Product> productList = this.productRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
         if (!Optional.of(productList).isPresent()) {
             logger.error("#### Possui erros na busca");
-            return this.response();
+            return this.response(Collections.EMPTY_LIST);
         }
         logger.info("#### Busca realizada com sucesso");
 
@@ -94,6 +97,31 @@ public class ProductService {
 
         final ProductDTO productDTO = ProductUtil.toProductDTO(product.get());
         return this.response(Optional.of(productDTO));
+    }
+
+    public ResponseEntity<Object> findByCategoryOrName(String param) {
+        List<Product> productList;
+        final String searchParam = param.toUpperCase();
+        if (searchParam.contains("NAO") || searchParam.contains("NÃO")
+                || searchParam.contains(CategoriesEnum.NAO_PERECIVEL.getDescription())) {
+            logger.error("#### Filtrar por categoria");
+            productList = this.productRepo.findByCategory(CategoriesEnum.NAO_PERECIVEL.getDescription());
+        } else if ("PERECIVEL".contains(searchParam)
+                || searchParam.contains(CategoriesEnum.PERECIVEL.getDescription())) {
+            logger.error("#### Filtrar por categoria");
+            productList = this.productRepo.findByCategory(CategoriesEnum.PERECIVEL.getDescription());
+        } else {
+            logger.error("#### Filtrar por produto");
+            productList = this.productRepo.findByName(param);
+        }
+
+        if (productList.isEmpty()) {
+            logger.error("#### Lista está vazia");
+            return this.response(Collections.EMPTY_LIST);
+        }
+        logger.info("#### Busca realizada com sucesso");
+        final List<ProductDTO> productDTOList = ProductUtil.toDTOList(productList);
+        return this.response(productDTOList);
     }
 
     /**

@@ -57,4 +57,8 @@ public class ProductController implements Serializable {
         return this.productService.findAllById(id);
     }
 
+    @GetMapping(value = "${controller.urn.findAllByCategoryOrName}")
+    public ResponseEntity<Object> findByCategoryOrName(@PathVariable("param") String param) {
+        return this.productService.findByCategoryOrName(param);
+    }
 }
