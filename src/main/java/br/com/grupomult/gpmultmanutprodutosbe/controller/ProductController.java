@@ -52,9 +52,9 @@ public class ProductController implements Serializable {
         return this.productService.findAll();
     }
 
-    @GetMapping(value = "${controller.urn.findById}")
+    @GetMapping(value = "${controller.urn.findAllById}")
     public ResponseEntity<Object> findById(@PathVariable("id") Long id) {
-        return this.productService.findById(id);
+        return this.productService.findAllById(id);
     }
 
 }

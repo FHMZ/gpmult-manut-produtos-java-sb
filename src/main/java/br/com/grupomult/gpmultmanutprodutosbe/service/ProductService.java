@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -46,7 +47,7 @@ public class ProductService {
         logger.info("#### Inserting Produto Valor: {}", productDTO.getValue());
         final Product product = ProductUtil.toProduct(productDTO);
         productRepo.save(product);
-        return this.response(productDTO);
+        return this.response(Optional.of(productDTO));
     }
 
     public ResponseEntity<Object> delete(Long id) {
@@ -62,33 +63,37 @@ public class ProductService {
 
         productRepo.deleteById(id);
         final ProductDTO productDTO = ProductUtil.toProductDTO(product.get());
-        return this.response(productDTO);
+        return this.response(Optional.of(productDTO));
     }
 
     public ResponseEntity<Object> findAll() {
-        logger.info("#### Busca todas os produtos cadastradas");
+        logger.info("#### Busca todas os produtos cadastrados");
         final List<Product> productList = this.productRepo.findAll(Sort.by(Sort.Direction.DESC, "id"));
         if (!Optional.of(productList).isPresent()) {
             logger.error("#### Possui erros na busca");
             return this.response();
         }
-        logger.error("#### Busca realizada com sucesso");
+        logger.info("#### Busca realizada com sucesso");
 
         final List<ProductDTO> productDTOList = ProductUtil.toDTOList(productList);
         return this.response(productDTOList);
     }
 
-    public ResponseEntity<Object> findById(Long id) {
+    public ResponseEntity<Object> findAllById(Long id) {
         logger.info("#### Busca por código id");
-        final Optional<Product> product = this.productRepo.findById(id);
+        final Optional<Product> product = this.productRepo
+                .findAll().stream()
+                .filter(p -> p.getId() == id)
+                .findFirst();
+
         if (!product.isPresent()) {
-            logger.error("#### Possui erros na busca");
-            return this.response();
+            logger.error("#### Lista está vazia");
+            return this.response(Optional.empty());
         }
-        logger.error("#### Busca realizada com sucesso");
+        logger.info("#### Busca realizada com sucesso");
 
         final ProductDTO productDTO = ProductUtil.toProductDTO(product.get());
-        return this.response(productDTO);
+        return this.response(Optional.of(productDTO));
     }
 
     /**
@@ -96,7 +101,7 @@ public class ProductService {
      *
      * @return ApiErrorResponse
      */
-    private ResponseEntity<Object> response(ProductDTO productDTO) {
+    private ResponseEntity<Object> response(Optional<ProductDTO> productDTO) {
         this.response.setCode("200");
         this.response.setMessage("OK");
         return ResponseEntity.status(200).body(productDTO);
