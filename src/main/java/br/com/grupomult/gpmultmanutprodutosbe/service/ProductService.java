@@ -102,7 +102,7 @@ public class ProductService {
     public ResponseEntity<Object> findByCategoryOrName(String param) {
         List<Product> productList;
         final String searchParam = param.toUpperCase();
-        if (searchParam.contains("NAO") || searchParam.contains("NÃO")
+        if ("NAO".contains(searchParam) || "NÃO".contains(searchParam)
                 || searchParam.contains(CategoriesEnum.NAO_PERECIVEL.getDescription())) {
             logger.error("#### Filtrar por categoria");
             productList = this.productRepo.findByCategory(CategoriesEnum.NAO_PERECIVEL.getDescription());
